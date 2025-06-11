@@ -44,9 +44,16 @@ app.get('/ping', (req, res) => {
 // Vulnerability 5: Insecure deserialization
 app.post('/deserialize', (req, res) => {
   const userInput = req.body.data;
-  // Insecure deserialization vulnerability
-  const deserializedData = serialize.unserialize(userInput);
-  res.send('Data processed');
+  // Validate user input before deserialization
+  try {
+    if (typeof userInput !== 'string' || !userInput.startsWith('{') || !userInput.endsWith('}')) {
+      throw new Error('Invalid input format');
+    }
+    const deserializedData = serialize.unserialize(userInput);
+    res.send('Data processed');
+  } catch (error) {
+    res.status(400).send('Invalid input');
+  }
 });
 
 // Vulnerability 6: Weak cryptography
